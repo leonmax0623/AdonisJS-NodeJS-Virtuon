@@ -1,0 +1,9 @@
+.dockerignore
+.editorconfig
+.env
+.git
+.gitignore
+.gitlab-ci.yml
+Dockerfile
+node_modules
+packages

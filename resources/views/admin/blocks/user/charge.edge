@@ -1,0 +1,6 @@
+<form action="{{ route('admin.user.charge', {id: user.id}) }}" method="POST">
+    Сумма к зачислению: <input type="text" name="amount" placeholder="0"/><br/>
+    <small>Если указать отрицательное число, то произойдёт <b>списание</b></small><br/><br/>
+    Комментарий для пользователя: <input type="text" name="reason" placeholder="Основание для зачисления"/><br/>
+    <input type="submit"/>
+</form>

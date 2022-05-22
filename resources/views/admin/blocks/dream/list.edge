@@ -1,0 +1,28 @@
+<div class=" p-3">
+    <h1 class="float-start">Управление мечтами</h1>
+    <a class="float-end" href="{{ route('admin.dream.add')}}"><button class="btn btn-primary btn-lg">Добавить мечту</button></a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" name="all_users" value="yes"></th>
+                <th>№</th>
+                <th>Имя мечты</th>
+                <th>Стоимость мечты</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            @each(dream in dreams)
+            <tr>
+                <td><input type="checkbox" name="user_id[]" value="{{ dream.id }}"></td>
+                <td>{{ $loop.index + 1 }}</td>
+                <td><a href="{{ route('admin.dream.edit', {id: dream.id}) }}">{{dream.name}}</a></td>
+                <td>{{dream.value || ''}}</td>
+                <td>
+                    [<a href="{{ route('admin.dream.delete', {id: dream.id}) }}" onclick="return window.confirm('Подтвердите операцию')">Удалить</a>]
+                </td>
+            </tr>
+            @endeach
+        </tbody>
+    </table>
+</div>

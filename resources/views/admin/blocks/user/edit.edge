@@ -1,0 +1,186 @@
+<div class="py-3">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button" role="tab" aria-controls="info" aria-selected="true">Basic Information</button>
+        </li>
+       <!-- <li class="nav-item" role="presentation">
+            <button class="nav-link id="dreams-tab" data-bs-toggle="tab" data-bs-target="#dreams" type="button" role="tab" aria-controls="dreams" aria-selected="false">Dreams</button>
+        </li> --!>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link id="accounts-tab" data-bs-toggle="tab" data-bs-target="#accounts" type="button" role="tab" aria-controls="accounts" aria-selected="false">Accounts</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" type="button" role="tab" aria-controls="transactions" aria-selected="false">Transactions</button>
+        </li>
+    </ul>
+
+    <div class="tab-content p-3" id="myTabContent">
+        <div class="tab-pane fade show active p-4" id="info" role="tabpanel" aria-labelledby="info-tab">
+            <form action="{{ route('admin.user.edit', {id: user.id}) }}" method="POST" class="form financial-form">
+                <div class="mb-3">
+                    <label>Username</label>
+                    <input type="text" name="username" value="{{ user.username || ''}}" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input type="text" name="email" value="{{ user.email || ''}}" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label>Password</label>
+                    <input type="password" name="password" value="" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <input type="submit" value="Сохранить" class="btn btn-primary btn-lg">
+                </div>
+            </form>
+        </div>
+        <div class="tab-pane fade p-4" id="dreams" role="tabpanel" aria-labelledby="dreams-tab">
+             <div class="row">
+                <form action="{{ route('admin.user.dream.add', {id: user.id}) }}" method="POST" class="form financial-form">
+                    <div class="mb-3">
+                        <label>Dreams</label>
+                        <select class="form-select" name="dream" id="dream" onChange="getCost(this.value)">
+                            @each(dream in dreams)
+                                @if(dream.id == userdreams.dream_id)
+                                    <option value="{{dream.id}},{{dream.value}}" selected>{{dream.name}}</option>
+                                @else
+                                    <option value="{{dream.id}},{{dream.value}}">{{dream.name}}</option>
+                                @endif
+                            @endeach
+                        </select>
+                        {{ elIf('<span class="text-danger">$self</span>', getErrorFor('dream'), hasErrorFor('dream')) }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Dream Cost</label>
+                        <input type="hidden" name="dream_id" id="dream_id" value="{{userdreams.dream_id}}" class="form-control" readOnly>
+                        <input type="text" name="cost" id="cost" value="{{userdreams.dreamCost}}" class="form-control" readOnly>
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="submit" value="Add Dream" class="btn btn-primary btn-lg">
+                    </div>
+                </form>
+            </div>
+        </div>
+         <div class="tab-pane fade p-4" id="accounts" role="tabpanel" aria-labelledby="accounts-tab">
+             <div class="row">
+                <form action="{{ route('admin.user.account.add', {id: user.id}) }}" method="POST" class="form financial-form">
+
+                    <div class="mb-3">
+                        <label>Account Name <span class="text-danger">*</span></label>
+                        <input type="text" name="accname" class="form-control">
+                        {{ elIf('<span class="text-danger">$self</span>', getErrorFor('accname'), hasErrorFor('accname')) }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Account Type <span class="text-danger">*</span></label>
+                        <select class="form-select" name="acctype">
+                        @each((type, index) in accType)
+                            <option value="{{type.name}}">{{type.value}}</option>
+                        @endeach
+                        </select>
+                        {{ elIf('<span class="text-danger">$self</span>', getErrorFor('acctype'), hasErrorFor('acctype')) }}
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="submit" value="Сохранить" class="btn btn-primary btn-lg">
+                    </div>
+                </form>
+            </div>
+            <div class="row">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Type</th>
+                            <th>Balance</th>
+                           <!-- <th>Action</th> --!>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @each(account in accounts)
+                        <tr>
+                            <td>{{ account.label }}</a></td>
+                            <td>{{ account.type }}</td>
+                            <td>{{ account.balance }}</td>
+                            <!-- <td>[ <a href="{{ route('admin.account.transactions', { account_id: account.id }) }}">Delete</a> ]</td> --!>
+                        </tr>
+                        @endeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tab-pane fade p-4" id="transactions" role="tabpanel" aria-labelledby="transactions-tab">
+            <div class="row">
+               <form action="{{ route('admin.account.charge') }}" method="POST" class="form financial-form">
+                    <div class="mb-3">
+                        <label>Счёт для зачисления</label>
+                        <select name="account_id" class="form-control">
+                            <option value="">Выберите учетную запись</option>
+                            @each(account in accounts)
+                            <option value="{{ account.id }}">{{ account.label }}</option>
+                            @endeach
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Сумма</label>
+                        <input type="text" name="amount" class="form-control" placeholder="Сумма к зачислению"/>
+                        {{ elIf('<span class="text-danger">$self</span>', getErrorFor('amount'), hasErrorFor('amount')) }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Комментарий</label>
+                        <textarea name="description" class="form-control"></textarea>
+                        {{ elIf('<span class="text-danger">$self</span>', getErrorFor('description'), hasErrorFor('description')) }}
+                    </div>
+
+                    <div class="mb-3">
+                        <input type="submit" value="Зачислить" class="btn btn-primary btn-lg" />
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <table class="table">
+                <thead>
+                    <tr>
+                    <th>Account</th>
+                    <th>Account Type</th>
+                    <th>Transaction Amount</th>
+                    <th>Description</th>
+                    <th>Transaction Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @each(traccounts in transactions)
+                    @set('label', traccounts.label)
+                    @set('type', traccounts.type)
+                    @each(transaction in traccounts.transactions)
+                        <tr>
+                            <td>{{label}}</td>
+                            <td>{{type}}</td>
+                            <td>{{transaction.amount}}</td>
+                            <td>{{transaction.description}}</td>
+                            <td>{{transaction.created_at}}</td>
+                        </tr>
+                        @endeach
+                    @endeach
+                </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function getCost(val){
+        var cost = val.split(",")
+        document.getElementById("cost").value = cost[1];
+        document.getElementById("dream_id").value = cost[0];
+    }
+</script>

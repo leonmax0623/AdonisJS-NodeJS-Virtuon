@@ -1,0 +1,31 @@
+<div class=" p-3">
+    <h1 class="float-start">Управление бейджами</h1>
+    <a class="float-end" href="{{ route('admin.badges.add')}}"><button class="btn btn-primary btn-lg">Добавить бейдж</button></a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" name="all_users" value="yes"></th>
+                <th>№</th>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            @each(badge in badges)
+            <tr>
+                <td><input type="checkbox" name="user_id[]" value="{{ badge.id }}"></td>
+                <td>{{ $loop.index + 1 }}</td>
+                <td>{{badge.name}}</td>
+                <td>{{badge.value}} V</td>
+                <td>{{badge.status == 1?'Active':'Inactive'}}</td>
+                <td>
+                [<a href="{{ route('admin.badges.edit', {id: badge.id}) }}">Edit</a>]
+                [<a href="{{ route('admin.badges.delete', {id: badge.id}) }}" onclick="return window.confirm('Подтвердите операцию')">Delete</a>]
+                </td>
+                </tr>
+            @endeach
+        </tbody>
+    </table>
+</div>

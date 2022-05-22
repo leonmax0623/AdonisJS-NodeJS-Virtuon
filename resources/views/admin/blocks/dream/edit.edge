@@ -1,0 +1,25 @@
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <h3>Мечта</h3>
+        <hr>
+        <form action="{{actionUrl}}" method="POST" class="form">
+            <input type="hidden" name="id" value="{{ dream.id || old('id', '') }}" class="form-control">
+            <div class="mb-3">
+                <label>Имя мечты</label>
+                <input type="text" name="name" value="{{ dream.name || old('name', '') }}" class="form-control">
+                {{ elIf('<span class="text-danger">$self</span>', getErrorFor('name'), hasErrorFor('name')) }}
+            </div>
+
+            <div class="mb-3">
+                <label>Стоимость мечты</label>
+                <input type="number" name="value" value="{{ dream.value || old('name', '')}}" class="form-control">
+                {{ elIf('<span class="text-danger">$self</span>', getErrorFor('value'), hasErrorFor('value')) }}
+            </div>
+
+            <div class="mb-3">
+                <input type="submit" value="Сохранить" class="btn btn-primary btn-lg">
+            </div>
+        </form>
+    </div>
+</div>
+

@@ -1,0 +1,13 @@
+@layout('admin.main')
+
+@section('content')
+<h1>
+    {{ shift.name }}<br/>
+    <small>{{ shift.description }}</small>
+</h1>
+
+<div>
+    <h3>Выберите пользователей</h3>
+    @include('admin.blocks.shift.add-users')
+</div>
+@endsection

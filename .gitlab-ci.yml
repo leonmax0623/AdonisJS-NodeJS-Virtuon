@@ -1,0 +1,69 @@
+stages:
+- build_dev
+- build_prod
+- deploy
+
+# When using dind, it's wise to use the overlayfs driver for
+# improved performance.
+variables:
+  DOCKER_DRIVER: overlay
+
+before_script:
+- docker info
+
+.build: &build_tpl
+  image: docker:latest
+  services:
+  - docker:dind
+  only:
+  - tags
+  - develop
+  - /^feature/
+  
+build_image:
+  <<: *build_tpl
+  stage: build_prod
+  script:
+  - docker build -t ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:-${CI_COMMIT_REF_SLUG}}
+    --build-arg APP_NAME="\"${CI_PROJECT_TITLE}\""
+    --build-arg GITLAB_USER=gitlab-ci-token
+    --build-arg GITLAB_PASS=${CI_BUILD_TOKEN}
+    ${CI_PROJECT_DIR}
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+  - docker push ${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG:-${CI_COMMIT_REF_SLUG}}
+  
+.deploy_template: &deploy_tpl
+  stage: deploy
+  image: alpine:latest
+  before_script:
+  - apk add openssh-client sshpass
+  script:
+  - sshpass -e ssh -o StrictHostKeyChecking=no -l${SSH_USER} ${SSH_HOST} -p ${SSH_PORT}
+    "export \$(xargs < \$(dirname ${DEPLOY_DOCKER_COMPOSE_FILE})/.env)
+      && export CT_API_IMAGE=${CI_REGISTRY_IMAGE} CT_API_TAG=${CI_COMMIT_TAG:-${CI_BUILD_REF_SLUG}}
+      && envsubst < \$(dirname ${DEPLOY_DOCKER_COMPOSE_FILE})/.env.src | tee \$(dirname ${DEPLOY_DOCKER_COMPOSE_FILE})/.env
+      && docker-compose -f ${DEPLOY_DOCKER_COMPOSE_FILE} pull ${DEPLOY_DOCKER_COMPOSE_SERVICE}
+      && docker-compose -f ${DEPLOY_DOCKER_COMPOSE_FILE} up -d ${DEPLOY_DOCKER_COMPOSE_SERVICE}
+      && docker image prune -a -f
+      && docker-compose -f ${DEPLOY_DOCKER_COMPOSE_FILE} exec -T ${DEPLOY_DOCKER_COMPOSE_SERVICE} adonis migration:run -f"
+
+# deploy_dev:
+#   <<: *deploy_tpl
+#   variables:
+#     SSH_HOST: ${SSH_HOST_DEV}
+#     SSH_PORT: ${SSH_PORT_DEV}
+#     SSH_USER: ${SSH_USER_DEV}
+#     SSHPASS: ${SSH_PASS_DEV}
+#   only:
+#   - develop
+
+# deploy_prod:
+#   <<: *deploy_tpl
+#   variables:
+#     SSH_HOST: ${SSH_HOST_PROD}
+#     SSH_PORT: ${SSH_PORT_PROD}
+#     SSH_USER: ${SSH_USER_PROD}
+#     SSHPASS: ${SSH_PASS_PROD}
+#   only:
+#   - tags
+#   when: manual

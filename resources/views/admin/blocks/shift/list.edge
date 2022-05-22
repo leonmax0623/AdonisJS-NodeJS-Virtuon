@@ -1,0 +1,24 @@
+<table class="table">
+    <tr>
+    <th>Имя</th>
+    <th>Начало</th>
+    <th>Конец</th>
+    <th>Периодичность начисления (дн)</th>
+    <th>Размер начисления</th>
+    <!-- <th>Пользователей в смене</th> --!>
+    </tr>
+    @each(shift in shifts)
+    <tr>
+    <td><a href="{{ route('admin.shift.view', {id: shift.id}) }}">{{shift.name}}</a><br/><small>{{shift.description}}</small></td>
+    <td>{{shift.begin}}</td>
+    <td>{{shift.end}}</td>
+    <td>{{shift.charge_interval}}</td>
+    <td>{{shift.charge_amount}}</td>
+   <!-- <td>{{shift.users_count}}</td> --!>
+    </tr>
+    @endeach
+</table>
+
+<!-- <div>
+    <a href="" class="btn btn-secondary">Добавить смену</a>
+</div> --!>

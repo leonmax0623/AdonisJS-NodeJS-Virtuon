@@ -1,0 +1,11 @@
+<table>
+    @each(transaction in transactions)
+    <tr>
+        <td>{{ transaction.account_name }}</td>
+        <td>{{ transaction.amount }}</td>
+        <td>{{ transaction.description }}</td>
+        <td>{{ transaction.created_at }}</td>
+        <td>[<a href="{{ route('admin.transaction.delete', {id: transaction.id}) }}" onclick="return window.confirm('Подтвердите удаление транзакции')">X</a>]</td>
+    </tr>
+    @endeach
+</table>

@@ -1,0 +1,17 @@
+@layout('admin.main')
+@section('content')
+  <div class="container ">
+    <div class="box mt-4">
+      <div class="box-header">
+        <h3>Scenario Day {{day}}</h3>
+      </div>
+      <div class="box-body>
+        <div class="row">
+          <div class="col-12">
+            @include('admin.blocks.scenario.edit')
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+@endsection

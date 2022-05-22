@@ -1,0 +1,44 @@
+<html>
+<head>
+{{ style('css/custom.css') }}
+{{ style('css/bootstrap.min.css') }}
+
+</head>
+<body>
+@loggedIn
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a href="{{ route('admin.dashboard') }}" class="nav-link">Главная</a></li>
+                <li class="nav-item"><a href="{{ route('admin.user.list') }}" class="nav-link">Пользователи</a></li>
+                <li class="nav-item"><a href="{{ route('admin.scenario.list') }}" class="nav-link">Сценарий</a></li>
+                <li class="nav-item"><a href="{{ route('admin.financial.list') }}" class="nav-link">Счета</a></li>
+                <li class="nav-item"><a href="{{ route('admin.dream.list') }}" class="nav-link">Мечты</a></li>
+                <li class="nav-item dropdown">
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Магазин</a>
+                    <div class="dropdown-menu">
+                        <a href="{{ route('admin.badges.list') }}" class="dropdown-item">Бэйджи</a>
+                        <a href="{{ route('admin.property.list') }}" class="dropdown-item">Собственность</a>
+                    </div>
+                </li>
+                <li class="nav-item"><a href="{{ route('admin.assignments') }}" class="nav-link">Стипендия</a></li>
+                <li class="nav-item"><a href="{{ route('admin.signout') }}" class="nav-link">Выход</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+@endloggedIn
+
+<div class="container-fluid">
+@!section('content')
+</div>
+
+{{ script('js/bootstrap.bundle.min.js') }}
+
+</body>
+</html>

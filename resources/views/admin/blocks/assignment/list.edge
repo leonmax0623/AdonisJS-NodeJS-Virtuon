@@ -1,0 +1,31 @@
+<div class=" p-3">
+    <h1 class="float-start">Управление стипендией</h1>
+    <a class="float-end" href="{{ route('admin.assignments.add')}}"><button class="btn btn-primary btn-lg">Добавить стипендию</button></a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" name="all_users" value="yes"></th>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Reward</th>
+                <th>Shift Day</th>
+                <th>Действие</th>
+            </tr>
+        </thead>
+        <tbody>
+            @each(assignment in assignments)
+            <tr>
+                <td><input type="checkbox" name="assignment_id[]" value="{{ assignment.id }}"></td>
+                <td>{{ $loop.index + 1 }}</td>
+                <td><a href="{{ route('admin.assignments.edit', {id: assignment.id}) }}">{{assignment.title}}</a></td>
+                <td>{{assignment.reward}}</td>
+                <td>{{assignment.shift_day}}</td>
+                <td>
+                    [<a href="{{ route('admin.assignments.edit', {id: assignment.id}) }}">Edit</a>]
+                    [<a href="{{ route('admin.assignments.delete', {id: assignment.id}) }}" onclick="return window.confirm('Подтвердите операцию')">Удалить</a>]
+                </td>
+            </tr>
+            @endeach
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,32 @@
+<div class="p-4">
+    <form action="{{ route('admin.shift.update', {id: shift.id}) }}" method="POST" class="form financial-form">
+        <div class="mb-3">
+            <label>Название</label>
+            <input type="text" name="name" id="name" value="{{ shift.name }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Описание</label>
+            <textarea name="description" class="form-control" style="height: 100px;">{{ shift.description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label>Начало</label>
+            <input type="date" name="begin" id="begin" value="{{ moment(shift.begin).format('YYYY-MM-DD') }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Конец</label>
+            <input type="date" name="end" id="end" value="{{ moment(shift.end).format('YYYY-MM-DD') }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Период начисления бонуса (дн)</label>
+            <input type="text" name="charge_interval" id="charge_interval" value="{{ shift.charge_interval }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <label>Размер бонуса</label>
+            <input type="text" name="charge_amount" id="charge_amount" value="{{ shift.charge_amount }}" class="form-control">
+        </div>
+        <div class="mb-3">
+            <input type="submit" value="Сохранить" class="btn btn-primary btn-lg">
+        </div>
+    </form>
+</div>
+

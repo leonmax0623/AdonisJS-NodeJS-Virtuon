@@ -1,0 +1,497 @@
+---
+openapi: 3.0.0
+info:
+  title: "API"
+  version: "1.0.0"
+
+servers:
+- url: http://{remote}/api
+  variables:
+    remote:
+      default: '212.193.54.230:5111'
+
+paths:
+  '/user/signup':
+    post:
+      tags: [Пользователь]
+      description: 'Регистрация пользователя'
+      requestBody:
+        content:
+          'application/x-www-form-urlencoded':
+            schema: &signup
+              type: object
+              properties:
+                username:
+                  type: string
+                # email:
+                #   type: string
+                #   format: email
+                password:
+                  type: string
+                dreamName:
+                  type: string
+                dreamCost:
+                  type: number
+          'multipart/form-data':
+            schema:
+              <<: *signup
+          'application/json':
+            schema:
+              <<: *signup
+      responses:
+        201:
+          description: 'OK'
+
+  '/user/signin':
+    post:
+      tags: [Пользователь]
+      requestBody:
+        content:
+          'application/x-www-form-urlencoded':
+            schema: &signin
+              type: object
+              properties:
+                login:
+                  type: string
+                  description: 'username или email пользователя'
+                password:
+                  type: string
+          'multipart/form-data':
+            schema:
+              <<: *signin
+          'application/json':
+            schema:
+              <<: *signin
+      responses:
+        200:
+          description: 'OK'
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/User'
+
+  '/user':
+    get:
+      tags: [Пользователь]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            'application/json':
+              schema:
+                type: object
+                allOf:
+                - $ref: '#/components/schemas/User'
+                - properties:
+                    accounts:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/UserAccount'
+                    current_shift:
+                      $ref: '#/components/schemas/Shift'
+                    tokens:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          type: &token_type
+                            type: string
+                            enum:
+                            - ios
+                            - android
+                            - web
+                          label:
+                            type: string
+                          created_at:
+                            type: string
+                            format: 'date-time'
+
+  '/accounts':
+    get:
+      tags: [Пользователь]
+      summary: 'Список счетов/кошельков пользователя'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserAccount'
+    post:
+      tags: [Пользователь]
+      summary: 'Создать новый счёт'
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/UserAccount'
+      responses:
+        201:
+          description: 'OK'
+
+  '/accounts/{account_id}/history':
+    parameters:
+      - in: path
+        name: account_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+
+    get:
+      tags: [Пользователь]
+      summary: 'История транзакций'
+      responses:
+        200:
+          description: 'OK'
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+
+  '/user/tokens':
+    post:
+      tags: [Пользователь]
+      requestBody:
+        content:
+          'application/x-www-form-urlencoded':
+            schema: &push_token
+              properties:
+                type:
+                  <<: *token_type
+                label:
+                  type: string
+                  description: 'Опциональное описание для токена'
+                token:
+                  type: string
+          'multipart/form-data':
+            schema:
+              <<: *push_token
+          'application/json':
+            schema:
+              <<: *push_token
+      responses:
+        201:
+          description: 'OK'
+
+    delete: &delete_tokens
+      description: 'Удаление всех токенов пользователя'
+      tags: [Пользователь]
+      responses:
+        204:
+          description: 'OK'
+
+  '/user/tokens/{token_id}':
+    delete:
+      description: 'Удаление выбранного токена'
+      <<: *delete_tokens
+      parameters:
+      - name: token_id
+        in: path
+        schema:
+          type: string
+        required: true
+
+  '/user/transactions':
+    get:
+      deprecated: true
+      tags: [Пользователь]
+      parameters:
+      - name: account
+        description: 'Тип аккаунта'
+        in: query
+        schema: &account
+          type: string
+          enum:
+          - common
+          - podushka
+          - sweets
+          - dream
+      - name: page
+        description: 'Номер страницы'
+        in: query
+        schema:
+          type: integer
+      - name: limit
+        description: 'Количество записей на странице'
+        in: query
+        schema:
+          type: integer
+      responses:
+        200:
+          description: 'OK'
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+
+  '/rating':
+    get:
+      tags: [Пользователь]
+      responses:
+        200:
+          description: 'OK'
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      properties:
+                        username:
+                          type: string
+                        score:
+                          type: number
+                          format: float
+
+  '/transactions':
+    post:
+      tags: [Транзакции]
+      requestBody:
+        content:
+          'application/x-www-form-urlencoded':
+            schema: &transfer
+              type: object
+              properties:
+                src_account_id:
+                  type: string
+                  format: uuid
+                  description: 'Аккаунт-источник'
+                dst_account_id:
+                  type: string
+                  format: uuid
+                  description: 'Аккаунт-получатель'
+                amount:
+                  type: number
+                  description: 'Сумма перевода'
+          'multipart/form-data':
+            schema:
+              <<: *transfer
+          'application/json':
+            schema:
+              <<: *transfer
+      responses:
+        201:
+          description: 'OK'
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  transaction_id:
+                    type: string
+                    format: uuid
+
+  '/trap/{id}':
+    post:
+      tags: ['Ловушки']
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          'application/x-www-urlencoded': &trap_result
+            schema:
+              type: object
+              properties:
+                result:
+                  type: string
+                  enum:
+                  - yes
+                  - no
+          'multipart/form-data':
+            <<: *trap_result
+          'application/json':
+            <<: *trap_result
+      responses:
+        202:
+          description: 'OK'
+
+components:
+  schemas:
+    UserAccount:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        type:
+          type: string
+          enum:
+            - dream
+            - wallet
+        label:
+          type: string
+        balance:
+          type: number
+          readOnly: true
+        threshold:
+          type: number
+        created_at:
+          type: string
+          format: datetime
+          readOnly: true
+        updated_at:
+          type: string
+          format: datetime
+          readOnly: true
+
+    User:
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        firstname:
+          type: string
+        lastname:
+          type: string
+        about:
+          type: string
+        dream:
+          type: string
+          description: 'Название мечты'
+        target:
+          type: integer
+          description: 'Стоимость мечты'
+        last_login:
+          type: string
+          format: 'date-time'
+        created_at:
+          type: string
+          format: 'date-time'
+        updated_at:
+          type: string
+          format: 'date-time'
+
+    Accounts:
+      properties:
+        common:
+          type: integer
+          description: 'Общий счёт'
+        podushka:
+          type: integer
+          description: 'Счёт «Подушка»'
+        sweets:
+          type: integer
+          description: 'Счёт «Вкусняшки»'
+        dream:
+          type: integer
+          description: 'Счёт «Мечта»'
+
+    Pagination:
+      properties:
+        total:
+          type: integer
+          description: 'Общее кол-во записей'
+        perPage:
+          type: integer
+          description: 'Кол-во записей на странице'
+        page:
+          type: integer
+          description: 'Текущая страница'
+        lastPage:
+          type: integer
+          description: 'Номер последней страницы'
+
+    Transaction:
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        account_id:
+          type: string
+          format: uuid
+        amount:
+          type: integer
+          description: 'Сумма операции'
+        description:
+          type: string
+        created_at:
+          type: string
+          format: 'date-time'
+          readOnly: true
+
+    Shift:
+      description: 'Смена'
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        begin:
+          type: string
+          format: date
+        end:
+          type: string
+          format: date
+
+    Trap:
+      description: 'Ловушка'
+      properties:
+        message:
+          type: array
+          items:
+            properties:
+              text:
+                type: string
+              actions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+                    label:
+                      type: string
+
+    PushEvent:
+      description: 'Входящее событие'
+      properties:
+        event_type:
+          type: string
+          enum:
+          - transaction_info
+          - trap
+
+    TransactionEvent:
+      description: 'Уведомление о новой транзакции'
+      allOf:
+      - $ref: '#/components/schemas/PushEvent'
+      - $ref: '#/components/schemas/Transaction'
+
+
+    TrapEvent:
+      description: 'Уведомление о ловушке'
+      allOf:
+      - $ref: '#/components/schemas/PushEvent'
+      - type: object
+        properties:
+          trap_id:
+            type: string
+          trap_payload:
+            type: string
+            description: 'Сериализованная JSON-строка ловушки (см.модель Trap)'

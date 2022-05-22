@@ -1,0 +1,27 @@
+<h3>Пополнение счёта</h3>
+
+<form action="{{ route('admin.account.charge') }}" method="POST">
+    <div class="mb-3">
+        <label>Счёт для зачисления</label>
+        <select name="account_id" class="form-control">
+            <option value="">Выберите учетную запись</option>
+            @each(account in accounts)
+            <option value="{{ account.id }}">{{ account.label }}</option>
+            @endeach
+        </select>
+    <div>
+
+    <div class="mb-3">
+        <label>Сумма</label>
+        <input type="text" name="amount" class="form-control" placeholder="Сумма к зачислению"/>
+    </div>
+
+    <div class="mb-3">
+        <label>Комментарий</label>
+        <textarea name="description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <input type="submit" value="Зачислить" class="btn btn-primary btn-lg" />
+    </div>
+</form>

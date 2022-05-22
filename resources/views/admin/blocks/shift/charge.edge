@@ -1,0 +1,15 @@
+<form action="{{ route('admin.shift.charge', {id: shift.id}) }}" method="POST">
+    @include('admin.blocks.user.list')
+    <hr/>
+    <b>Счёт для зачисления:</b>
+    <select name="account">
+        <option value="common" selected>Общий</option>
+        <option value="sweets">Вкусняшки</option>
+        <option value="podushka">Подушка</option>
+        <option value="dream">Мечта</option>
+    </select>
+    <br/>
+    <b>Сумма</b>: <input type="integer" name="amount"><br/>
+    <b>Комментарий</b>: <input type="text" name="readon" placeholder="Основание для зачисления" value="От администрации"><br/>
+    <input type="submit" value="Зачислить"/>
+</form>

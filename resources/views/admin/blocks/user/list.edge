@@ -1,0 +1,36 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th><input type="checkbox" name="all_users" value="yes"></th>
+            <th>№</th>
+            <th>Логин</th>
+            <th>Email</th>
+            <th>Общий баланс</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        @each(user in users)
+        <tr>
+            <td><input type="checkbox" name="user_id[]" value="{{ user.id }}"></td>
+            <td>{{ $loop.index + 1 }}</td>
+            <td><a href="{{ route('admin.user.edit', {id: user.id}) }}">{{user.username}}</a></td>
+            <td>{{user.email || '-'}}</td>
+            <td>{{user.total_balance}}</td>
+            <td>
+                @if(user.status == 'inactive')
+                [<a href="{{ route('admin.user.status-toggle', {id: user.id}) }}">Активировать</a>]
+                @else
+                [<a href="{{ route('admin.user.status-toggle', {id: user.id}) }}">Заблокировать</a>]
+                @endif
+                |
+                @if(shift)
+                [<a href="{{ route('admin.user.revoke-shift', {id: user.id}) }}?shift_id={{ shift.id }}" onclick="return window.confirm('Подтвердите операцию')">Исключить</a>]
+                @else
+                [<a href="{{ route('admin.user.delete', {id: user.id}) }}" onclick="return window.confirm('Подтвердите операцию')">Удалить</a>]
+                @endif
+            </td>
+            </tr>
+        @endeach
+    </tbody>
+</table>

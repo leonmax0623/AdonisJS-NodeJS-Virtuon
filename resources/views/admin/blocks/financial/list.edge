@@ -1,0 +1,20 @@
+<table class="table">
+    <tr>
+        <th>Icon</th>
+        <th>Name</th>
+        <th>Value</th>
+        <th>Account Type</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+    @each(aType in accType)
+    <tr>
+        <td> <img src="{{aType.icon?aType.icon:'/img/placeholder.png'}}" height="40px"></td>
+        <td><a href="{{ route('admin.financial.edit', {id: aType.id}) }}">{{aType.name}}</a><br/><small>{{aType.description}}</small></td>
+        <td>{{aType.value}}</td>
+        <td>{{aType.is_default?'Default':'Static'}}</td>
+        <td>{{aType.status == '1'?'Active':'Inactive'}}</td>
+        <td>[ <a href="{{ route('admin.financial.edit', {id: aType.id}) }}">Edit</a> ]</td>
+    </tr>
+    @endeach
+</table>

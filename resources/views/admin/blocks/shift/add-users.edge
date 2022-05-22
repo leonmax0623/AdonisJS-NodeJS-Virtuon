@@ -1,0 +1,8 @@
+<form action="{{ route('admin.shift.invite.do', {id: shift.id }) }}" method="POST">
+    <ul>
+        @each(user in users)
+        <li><input type="checkbox" name="user_id[]" value="{{ user.id }}"> {{ user.username }}</li>
+        @endeach
+    </ul>
+    <input type="submit" value="Добавить"/>
+</form>
